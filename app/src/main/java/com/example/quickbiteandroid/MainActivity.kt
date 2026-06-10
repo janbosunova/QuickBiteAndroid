@@ -3,23 +3,26 @@ package com.example.quickbiteandroid
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.Image
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            QuickBiteApp()
+            MaterialTheme {
+                QuickBiteApp()
+            }
         }
     }
 }
@@ -49,33 +52,118 @@ fun QuickBiteApp() {
 }
 
 @Composable
+fun ScreenLayout(
+    title: String,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Scaffold { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(20.dp),
+            verticalArrangement = Arrangement.Top
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineMedium
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            content()
+        }
+    }
+}
+
+@Composable
+fun BackButton(onBack: () -> Unit) {
+    OutlinedButton(
+        onClick = onBack,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text("Back")
+    }
+}
+
+@Composable
+fun FoodItemCard(
+    foodName: String,
+    price: String,
+    onFoodDetails: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = foodName,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = price,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Button(
+                onClick = onFoodDetails,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Food Details")
+            }
+        }
+    }
+}
+
+@Composable
 fun HomeScreen(onViewMenu: () -> Unit) {
-    Column(modifier = Modifier.padding(20.dp)) {
-
+    ScreenLayout(title = "QuickBite") {
         Text(
-            text = "QuickBite",
-            style = MaterialTheme.typography.headlineLarge
+            text = "Fast food delivery app",
+            style = MaterialTheme.typography.bodyLarge
         )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Text("Fast food delivery app")
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .padding(20.dp)
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
         ) {
-            Column {
-                Text("Featured Restaurant")
-                Text("Campus Burger")
+            Column(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .padding(20.dp)
+            ) {
+                Text(
+                    text = "Featured Restaurant",
+                    style = MaterialTheme.typography.titleMedium
+                )
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                Button(onClick = onViewMenu) {
+                Text(
+                    text = "Campus Burger",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = onViewMenu,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text("View Menu")
                 }
             }
@@ -88,35 +176,16 @@ fun MenuScreen(
     onFoodDetails: () -> Unit,
     onBack: () -> Unit
 ) {
-
-    Column(modifier = Modifier.padding(20.dp)) {
-
-        Text(
-            text = "Menu",
-            style = MaterialTheme.typography.headlineMedium
+    ScreenLayout(title = "Menu") {
+        FoodItemCard(
+            foodName = "Cheeseburger",
+            price = "$8.99",
+            onFoodDetails = onFoodDetails
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text("Cheeseburger")
-            Text("$8.99")
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Button(onClick = onFoodDetails) {
-            Text("Food Details")
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Button(onClick = onBack) {
-            Text("Back")
-        }
+        BackButton(onBack = onBack)
     }
 }
 
@@ -125,48 +194,55 @@ fun FoodDetailsScreen(
     onAddToCart: () -> Unit,
     onBack: () -> Unit
 ) {
-
-    Column(modifier = Modifier.padding(20.dp)) {
-
-        Text(
-            text = "Food Details",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp)
-                .background(MaterialTheme.colorScheme.secondaryContainer),
-            contentAlignment = Alignment.Center
+    ScreenLayout(title = "Food Details") {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
         ) {
             Image(
                 painter = painterResource(R.drawable.burger),
-                contentDescription = "Burger",
-                modifier = Modifier.fillMaxSize(),
+                contentDescription = "Burger image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp),
                 contentScale = ContentScale.Crop
             )
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Text("Cheeseburger")
-        Text("Fresh burger with cheese")
-        Text("Price: $8.99")
+        Text(
+            text = "Cheeseburger",
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Fresh burger with cheese",
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Price: $8.99",
+            style = MaterialTheme.typography.titleMedium
+        )
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Button(onClick = onAddToCart) {
+        Button(
+            onClick = onAddToCart,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text("Add to Cart")
         }
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        Button(onClick = onBack) {
-            Text("Back")
-        }
+        BackButton(onBack = onBack)
     }
 }
 
@@ -175,39 +251,42 @@ fun CartScreen(
     onCheckout: () -> Unit,
     onBack: () -> Unit
 ) {
-
-    Column(modifier = Modifier.padding(20.dp)) {
-
-        Text(
-            text = "Cart",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Row(
+    ScreenLayout(title = "Cart") {
+        Card(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
         ) {
-            Text("Cheeseburger")
-            Text("$8.99")
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Cheeseburger")
+                    Text("$8.99")
+                }
+
+                Divider(modifier = Modifier.padding(vertical = 12.dp))
+
+                Text(
+                    text = "Total: $8.99",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Text("Total: $8.99")
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Button(onClick = onCheckout) {
+        Button(
+            onClick = onCheckout,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text("Checkout")
         }
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        Button(onClick = onBack) {
-            Text("Back")
-        }
+        BackButton(onBack = onBack)
     }
 }
 
@@ -215,22 +294,32 @@ fun CartScreen(
 fun CheckoutScreen(
     onBackHome: () -> Unit
 ) {
-
-    Column(modifier = Modifier.padding(20.dp)) {
-
-        Text(
-            text = "Checkout",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text("Payment and order summary")
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Button(onClick = onBackHome) {
-            Text("Back Home")
+    ScreenLayout(title = "Checkout") {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Payment and order summary",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
         }
-    }
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text("Order: Cheeseburger")
+        Text("Total: $8.99")
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text("Order: Cheeseburger")
+        Text("Total: $8.99")
+        Spacer(modifier = Modifier.height(20.dp))
+        Button(onClick = onBackHome,
+modifier = Modifier.fillMaxWidth()
+) {
+    Text("Back Home")
+}
+}
 }
